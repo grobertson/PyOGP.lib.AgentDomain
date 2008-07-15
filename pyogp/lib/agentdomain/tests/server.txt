@@ -1,0 +1,55 @@
+An Agent Domain which knows how to login and let avatars teleport can look as follows:
+
+>>> from pyogp.lib.capsserver import CapabilitiesServer
+>>> from pyogp.lib.agentdomain import AgentDomain
+>>> caps_server = CapabilitiesServer('localhost:12344')
+
+
+We can use the caps server as follows:
+>>> cap = caps_server.grant("key","http://private_url")
+>>> len(cap.public_url)==32
+True
+
+And we can now instantiate the AgentDomain object with this caps server:
+>>> ad = AgentDomain(caps_server)
+
+There probably can be many instances of this around. It's not necessarily a session though.
+The agent object is supposed to be the session data holder and points to some agent domain.
+
+To get an agent object we have to login with credentials we got over the network:
+>>> agent = ad.login(credentials)
+
+The agent now contains the seed capability which was created like shown above. 
+
+Question: How does the seed cap look like? The Caps server needs to know.
+But how does the private URL look like? The network layer might know.
+
+The network layer knows the hostname etc. but each component here needs to know it's own path.
+LL would probably do it with mulib and somehow register it in a namespace.
+
+Idea: Every component has some base url 
+
+This uses the caps server to create the public url and we can simply serialize the agent
+to some LLSD:
+
+And send it out somehow via a network layer:
+
+>>> network = getUtility(INetworkLayer)
+>>> network.send(agent)
+
+This will do something like this internally:
+
+>>> from pyogp.lib.agentdomain.interfaces import ISerializer
+>>> serializer = ISerializer(agent)
+>>> header = serializer.headers
+>>> payload = serializer.payload
+
+
+
+
+Now we could send this capability to the client via the network:
+>>> agent.
+
+We could send this back to over the network.
+
+The next thing is how to handle capabilities anyway. The seed cap is now being
